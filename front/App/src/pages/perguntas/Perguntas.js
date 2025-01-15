@@ -15,13 +15,13 @@ import {
   Button,
   Box,
   MenuItem,
+  Grid,
 } from "@mui/material";
 
 const Perguntas = () => {
   const [perguntas, setPerguntas] = useState([]);
   const [formData, setFormData] = useState({
     texto_pergunta: "",
-    // tipo_pergunta: '',
     tipo: "",
     opcoes_resposta: [{ resposta: "", pontos: "" }],
   });
@@ -34,7 +34,6 @@ const Perguntas = () => {
     const token = localStorage.getItem("token");
     if (token) {
       const decoded = jwtDecode(token);
-      const userId = decoded.id;
       setIsAdmin(decoded.isAdmin);
     }
     fetchPerguntas();
@@ -55,9 +54,9 @@ const Perguntas = () => {
     }
   };
 
-  const token = localStorage.getItem("token");
   const fetchPerguntas = async () => {
     try {
+      const token = localStorage.getItem("token");
       const response = await axios.get("http://localhost:3000/perguntas", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -70,12 +69,7 @@ const Perguntas = () => {
   };
 
   const handleInputChange = (e) => {
-    if (e.target.name === "tipo") {
-      const selectedType = tipos.find((tipo) => tipo._id === e.target.value);
-      setFormData({ ...formData, tipo: selectedType._id });
-    } else {
-      setFormData({ ...formData, [e.target.name]: e.target.value });
-    }
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const adicionarOpcao = () => {
@@ -101,7 +95,7 @@ const Perguntas = () => {
         formData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
@@ -109,7 +103,6 @@ const Perguntas = () => {
       setOpenModal(false);
       setFormData({
         texto_pergunta: "",
-        tipo_pergunta: "",
         tipo: "",
         opcoes_resposta: [{ resposta: "", pontos: "" }],
       });
@@ -122,7 +115,6 @@ const Perguntas = () => {
     setEditPergunta(pergunta);
     setFormData({
       texto_pergunta: pergunta.texto_pergunta,
-      tipo_pergunta: pergunta.tipo_pergunta,
       tipo: pergunta.tipo,
       opcoes_resposta: pergunta.opcoes_resposta,
     });
@@ -166,7 +158,6 @@ const Perguntas = () => {
     setOpenModal(false);
     setFormData({
       texto_pergunta: "",
-      tipo_pergunta: "",
       tipo: "",
       opcoes_resposta: [{ resposta: "", pontos: "" }],
     });
@@ -175,7 +166,7 @@ const Perguntas = () => {
 
   return (
     <div>
-      <HomePage></HomePage>
+      <HomePage />
       {isAdmin && (
         <Box
           sx={{
@@ -183,7 +174,6 @@ const Perguntas = () => {
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            width: "auto",
             backgroundColor: "white",
             borderRadius: "xl",
             p: 5,
@@ -226,8 +216,6 @@ const Perguntas = () => {
                 {perguntas.map((pergunta) => (
                   <TableRow key={pergunta._id}>
                     <TableCell>{pergunta.texto_pergunta}</TableCell>
-                    {/* <TableCell>{pergunta.tipo_pergunta}</TableCell> */}
-                    {/* <TableCell>{pergunta.tipo}</TableCell> */}
                     <TableCell
                       sx={{
                         display: "flex",
@@ -272,9 +260,8 @@ const Perguntas = () => {
                 flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center",
-                width: "70%", // Aumenta a largura para 70% da tela, você pode ajustar esse valor
-                maxWidth: "800px", // Define um limite máximo de largura
-                height: "50%", // Define a altura do modal, 80% da tela
+                width: "70%",
+                maxWidth: "700px",
                 backgroundColor: "white",
                 borderRadius: "xl",
                 p: 5,
@@ -285,42 +272,42 @@ const Perguntas = () => {
               <form
                 onSubmit={editPergunta ? handleUpdateSubmit : handleFormSubmit}
               >
-                <Box sx={{ display: "flex", gap: 1, mb: "1rem" }}>
-                  <TextField
-                    label="Insira sua pergunta"
-                    variant="standard"
-                    fullWidth
-                    name="texto_pergunta"
-                    value={formData.texto_pergunta}
-                    onChange={handleInputChange}
-                    sx={{ width: "100%" }}
-                  />
-                  {/* <TextField
-                  label="Tipo pergunta"
-                  variant="outlined"
-                  fullWidth
-                  name="tipo_pergunta"
-                  value={formData.tipo_pergunta}
-                  onChange={handleInputChange}
-                  sx={{ width: '20%', }}
-                /> */}
-                  <TextField
-                    select
-                    label="Selecione o Tipo"
-                    variant="standard"
-                    fullWidth
-                    name="tipo"
-                    value={formData.tipo}
-                    onChange={handleInputChange}
-                    sx={{ width: "40%" }}
-                  >
-                    {tipos.map((tipo) => (
-                      <MenuItem key={tipo._id} value={tipo._id}>
-                        {tipo.name}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Box>
+                <Grid container spacing={2} sx={{ mb: "1rem", width: "100%" }}>
+                  {/* Campo "Insira sua pergunta" com ajuste automático de altura */}
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Insira sua pergunta"
+                      variant="standard"
+                      fullWidth
+                      name="texto_pergunta"
+                      value={formData.texto_pergunta}
+                      onChange={handleInputChange}
+                      sx={{ width: "100%" }}
+                      multiline
+                      maxRows={10} // Limita o número máximo de linhas visíveis
+                    />
+                  </Grid>
+
+                  {/* Campo "Selecione o Tipo" com largura menor */}
+                  <Grid item xs={12} sm={(5, 5)}>
+                    <TextField
+                      select
+                      label="Selecione o Tipo"
+                      variant="standard"
+                      fullWidth
+                      name="tipo"
+                      value={formData.tipo}
+                      onChange={handleInputChange}
+                    >
+                      {tipos.map((tipo) => (
+                        <MenuItem key={tipo._id} value={tipo._id}>
+                          {tipo.name}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                </Grid>
+
                 {formData.opcoes_resposta.map((opcao, index) => (
                   <Box
                     key={index}
@@ -348,6 +335,8 @@ const Perguntas = () => {
                       label="Insira uma opção de resposta"
                       variant="standard"
                       sx={{ width: "60%" }}
+                      multiline
+                      maxRows={5} // Limita o número máximo de linhas visíveis
                     />
                     <TextField
                       type="number"
@@ -378,6 +367,7 @@ const Perguntas = () => {
                     </Button>
                   </Box>
                 ))}
+
                 <Button
                   variant="outlined"
                   color="success"
