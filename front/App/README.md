@@ -77,3 +77,8 @@ npm start
 cd front\App
 npm install //Instalar as dependencias
 npm start
+
+Sempre que fizer alterações no projeto e quiser enviá-las ao GitHub:
+git add .
+git commit -m "Descrição das alterações"
+git push

@@ -123,14 +123,29 @@ const Perguntas = () => {
 
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
+    if (!editPergunta || !editPergunta._id) {
+      console.error("Pergunta para edição não está corretamente definida.");
+      return;
+    }
     try {
       await axios.put(
         `http://localhost:3000/perguntas/${editPergunta._id}`,
-        formData
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
       fetchPerguntas();
       setOpenModal(false);
       setEditPergunta(null);
+      setFormData({
+        texto_pergunta: "",
+        tipo: "",
+        opcoes_resposta: [{ resposta: "", pontos: "" }],
+      });
     } catch (error) {
       console.error("Error updating pergunta:", error);
     }
@@ -284,12 +299,12 @@ const Perguntas = () => {
                       onChange={handleInputChange}
                       sx={{ width: "100%" }}
                       multiline
-                      maxRows={10} // Limita o número máximo de linhas visíveis
+                      maxRows={10}
                     />
                   </Grid>
 
                   {/* Campo "Selecione o Tipo" com largura menor */}
-                  <Grid item xs={12} sm={(5, 5)}>
+                  <Grid item xs={12} sm={4}>
                     <TextField
                       select
                       label="Selecione o Tipo"
@@ -336,7 +351,7 @@ const Perguntas = () => {
                       variant="standard"
                       sx={{ width: "60%" }}
                       multiline
-                      maxRows={5} // Limita o número máximo de linhas visíveis
+                      maxRows={5}
                     />
                     <TextField
                       type="number"
