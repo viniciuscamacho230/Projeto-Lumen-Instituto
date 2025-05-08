@@ -91,7 +91,7 @@ app.delete("/perguntas/:id", perguntaRoutes);
 
 mongoose
   .connect(
-    `mongodb+srv:// LINK DO SEU BANCO AQUI - MONGO DB`
+    `mongodb+srv://viniciuscamacho01:ItynniLVFhLNH3O5@cluster2024.m6wbd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster2024`
   )
   .then(() => {
     app.listen(3000);
